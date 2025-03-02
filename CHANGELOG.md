@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.1.0](https://github.com/Lol-prono/agenda/compare/v6.0.0...v6.1.0) (2025-03-02)
+
+
+### Features
+
+* add delay utility function and enhance job management methods ([36ac087](https://github.com/Lol-prono/agenda/commit/36ac087092a1f27a7ae104c1d6a51252d54ea091))
+
+
+### Bug Fixes
+
+* enable esModuleInterop and update import statements for consistency ([bf5ce7d](https://github.com/Lol-prono/agenda/commit/bf5ce7d8b3780f8bf534c78807f8608aa81e8dc1))
+* use sudo for global npm installation in CI workflow ([dac2671](https://github.com/Lol-prono/agenda/commit/dac267138fd63fed1cd2c933da604b6ee8c0eb33))
+
 ## 6.0.0 (2025-01-27)
 
 
