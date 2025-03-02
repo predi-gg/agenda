@@ -34,7 +34,7 @@ jobs:
             ${{ runner.os }}-build-agenda-
 
       - name: Update npm
-        run: npm -g install npm@latest
+        run: sudo npm -g install npm@latest
 
       - name: Install Packages
         run: npm install
