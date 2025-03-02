@@ -64,7 +64,6 @@ describe('Agenda', () => {
 	});
 
 	it('sets a default processEvery', () => {
-		console.log('test');
 		expect(globalAgenda.attrs.processEvery).to.equal(5000);
 	});
 

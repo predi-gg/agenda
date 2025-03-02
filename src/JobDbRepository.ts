@@ -1,4 +1,4 @@
-import * as debug from 'debug';
+import debug from 'debug';
 import {
 	Collection,
 	Db,
@@ -8,7 +8,7 @@ import {
 	MongoClientOptions,
 	ObjectId,
 	Sort,
-	UpdateFilter,
+	UpdateFilter
 } from 'mongodb';
 import type { Job, JobWithId } from './Job';
 import type { Agenda } from './index';
@@ -98,7 +98,7 @@ export class JobDbRepository {
 	 * Internal method to toggle the `disabled` flag on jobs in the DB
 	 */
 	async setJobsDisabled(query: Filter<IJobParameters>, disabled: boolean): Promise<number> {
-		const result = await this.updateMany(query, { $set: { disabled }});
+		const result = await this.updateMany(query, { $set: { disabled } });
 		return result || 0;
 	}
 
@@ -408,7 +408,7 @@ export class JobDbRepository {
 		}
 	}
 
-		/**
+	/**
 	 * Internal method used to update multiple jobs with one call
 	 * @name JobDbRepository#updateMany
 	 * @function
@@ -418,12 +418,9 @@ export class JobDbRepository {
 		query: Filter<IJobParameters>,
 		update: UpdateFilter<IJobParameters>
 	): Promise<number> {
-		const { modifiedCount, matchedCount } = await this.collection.updateMany(
-			query,
-			update
-		);
-		if(matchedCount !== modifiedCount) {
-		  log(`WARN: ${matchedCount} jobs matched query but ${modifiedCount} were modified`);
+		const { modifiedCount, matchedCount } = await this.collection.updateMany(query, update);
+		if (matchedCount !== modifiedCount) {
+			log(`WARN: ${matchedCount} jobs matched query but ${modifiedCount} were modified`);
 		}
 
 		return modifiedCount;

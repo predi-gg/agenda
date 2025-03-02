@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
-import * as debug from 'debug';
+import debug from 'debug';
 
-import type { Db, Filter, MongoClientOptions, Sort, UpdateResult } from 'mongodb';
+import type { Db, Filter, MongoClientOptions, Sort } from 'mongodb';
 import { SortDirection } from 'mongodb';
 import { ForkOptions } from 'child_process';
 import type { IJobDefinition } from './types/JobDefinition';
@@ -105,8 +105,7 @@ export class Agenda extends EventEmitter {
 			defaultLockLimit?: number;
 			lockLimit?: number;
 			defaultLockLifetime?: number;
-			// eslint-disable-next-line @typescript-eslint/ban-types
-		} & (IDatabaseOptions | IMongoOptions | {}) &
+		} & (IDatabaseOptions | IMongoOptions | object) &
 			IDbConfig & {
 				forkHelper?: { path: string; options?: ForkOptions };
 				forkedWorker?: boolean;
@@ -199,27 +198,24 @@ export class Agenda extends EventEmitter {
 			throw error;
 		}
 	}
-	  /**
+	/**
 	 * Disables any jobs matching the passed MongoDB query by setting the `disabled` flag to `true`
 	 * @name Agenda#disable
 	 * @function
 	 * @param query MongoDB query to use when enabling
 	 * @returns {Promise<number>} Resolved with the number of disabled job instances.
 	 */
-	async disable (
-	  this: Agenda,
-	  query: Filter<IJobParameters>
-	): Promise<number> {
-	  log('attempting to disable all jobs matching query: %o', query);
-	  try {
-	    const modifiedCount = await this.db.setJobsDisabled(query, true);
-	    log(`${modifiedCount} jobs disabled`);
-	    return modifiedCount;
-	  } catch (error) {
-	    log('error trying to mark jobs as `disabled`');
-	    throw error;
-	  }
-	};
+	async disable(this: Agenda, query: Filter<IJobParameters>): Promise<number> {
+		log('attempting to disable all jobs matching query: %o', query);
+		try {
+			const modifiedCount = await this.db.setJobsDisabled(query, true);
+			log(`${modifiedCount} jobs disabled`);
+			return modifiedCount;
+		} catch (error) {
+			log('error trying to mark jobs as `disabled`');
+			throw error;
+		}
+	}
 
 	/**
 	 * Enables any jobs matching the passed MongoDB query by setting the `disabled` flag to `false`
@@ -229,20 +225,17 @@ export class Agenda extends EventEmitter {
 	 * @caller client code, Agenda.purge(), Job.remove()
 	 * @returns {Promise<Number>} A promise that contains the number of removed documents when fulfilled.
 	 */
-	async enable (
-	  this: Agenda,
-	  query:  Filter<IJobParameters> = {}
-	): Promise<number> {
-	  log('attempting to enable all jobs matching query %o', query);
-	  try {
-	    const modifiedCount = await this.db.setJobsDisabled(query, false);
-	    log(`${modifiedCount} jobs enabled`);
-	    return modifiedCount;
-	  } catch (error) {
-	    log('error trying to mark jobs as `enabled`');
-	    throw error;
-	  }
-	};
+	async enable(this: Agenda, query: Filter<IJobParameters> = {}): Promise<number> {
+		log('attempting to enable all jobs matching query %o', query);
+		try {
+			const modifiedCount = await this.db.setJobsDisabled(query, false);
+			log(`${modifiedCount} jobs enabled`);
+			return modifiedCount;
+		} catch (error) {
+			log('error trying to mark jobs as `enabled`');
+			throw error;
+		}
+	}
 
 	/**
 	 * Set name of queue

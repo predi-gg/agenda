@@ -7,7 +7,6 @@ export function getCallerFilePath(position = 2): string | undefined {
 
 	const oldPrepareStackTrace = Error.prepareStackTrace;
 	Error.prepareStackTrace = (_, stack) => stack;
-	// eslint-disable-next-line unicorn/error-message
 	const { stack } = new Error();
 	Error.prepareStackTrace = oldPrepareStackTrace;
 
