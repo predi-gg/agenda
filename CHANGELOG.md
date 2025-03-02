@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [6.1.2](https://github.com/Lol-prono/agenda/compare/v6.1.1...v6.1.2) (2025-03-02)
+
+
+### Bug Fixes
+
+* enhance job retrieval logic in Agenda.now method to create job if not found ([62ab944](https://github.com/Lol-prono/agenda/commit/62ab944b7e05d82c0d761e290143812730168213))
+
 ### [6.1.1](https://github.com/Lol-prono/agenda/compare/v6.1.0...v6.1.1) (2025-03-02)
 
 
