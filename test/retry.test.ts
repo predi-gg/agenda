@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { Db } from 'mongodb';
-import * as delay from 'delay';
+import { delay } from '../src/utils/delay';
 import { mockMongo } from './helpers/mock-mongodb';
 
 import { Agenda } from '../src';
@@ -17,7 +17,7 @@ const clearJobs = async (): Promise<void> => {
 };
 
 const jobType = 'do work';
-const jobProcessor = () => { };
+const jobProcessor = () => {};
 
 describe('Retry', () => {
 	beforeEach(async () => {
@@ -75,8 +75,8 @@ describe('Retry', () => {
 		});
 
 		const successPromise = new Promise(resolve => {
-      agenda.on('success:a job', resolve)
-    });
+			agenda.on('success:a job', resolve);
+		});
 
 		await agenda.now('a job');
 

@@ -1,11 +1,11 @@
 /* eslint-disable no-console,no-unused-expressions,@typescript-eslint/no-unused-expressions */
 
-import * as delay from 'delay';
 import { Db } from 'mongodb';
 import { expect } from 'chai';
 import { mockMongo } from './helpers/mock-mongodb';
 
 import { Agenda } from '../src';
+import { delay } from '../src/utils/delay';
 import { hasMongoProtocol } from '../src/utils/hasMongoProtocol';
 import { Job } from '../src/Job';
 
@@ -64,6 +64,7 @@ describe('Agenda', () => {
 	});
 
 	it('sets a default processEvery', () => {
+		console.log('test');
 		expect(globalAgenda.attrs.processEvery).to.equal(5000);
 	});
 
@@ -337,18 +338,14 @@ describe('Agenda', () => {
 						job2.attrs.nextRunAt!.toISOString()
 					);
 
-					mongoDb
+					const jobs = await mongoDb
 						.collection('agendaJobs')
 						.find({
 							name: 'unique job'
 						})
-						.toArray((err, jobs) => {
-							if (err) {
-								throw err;
-							}
+						.toArray();
 
-							expect(jobs).to.have.length(1);
-						});
+					expect(jobs).to.have.length(1);
 				});
 
 				it('should not modify job when unique matches and insertOnly is set to true', async () => {
@@ -389,19 +386,14 @@ describe('Agenda', () => {
 						.save();
 
 					expect(job1.attrs.nextRunAt!.toISOString()).to.equal(job2.attrs.nextRunAt!.toISOString());
-
-					mongoDb
+					const jobs = await mongoDb
 						.collection('agendaJobs')
 						.find({
 							name: 'unique job'
 						})
-						.toArray((err, jobs) => {
-							if (err) {
-								throw err;
-							}
+						.toArray();
 
-							expect(jobs).to.have.length(1);
-						});
+					expect(jobs).to.have.length(1);
 				});
 			});
 
@@ -438,18 +430,14 @@ describe('Agenda', () => {
 						.schedule(time)
 						.save();
 
-					mongoDb
+					const jobs = await mongoDb
 						.collection('agendaJobs')
 						.find({
 							name: 'unique job'
 						})
-						.toArray((err, jobs) => {
-							if (err) {
-								throw err;
-							}
+						.toArray();
 
-							expect(jobs).to.have.length(2);
-						});
+					expect(jobs).to.have.length(2);
 				});
 			});
 		});
@@ -599,6 +587,107 @@ describe('Agenda', () => {
 			expect(job1.attrs.data).to.equal(3);
 			expect(job2.attrs.data).to.equal(2);
 			expect(job3.attrs.data).to.equal(1);
+		});
+	});
+	describe('disable', () => {
+		beforeEach(async () => {
+			await Promise.all([
+				globalAgenda.create('sendEmail', { to: 'some guy' }).schedule('1 minute').save(),
+				globalAgenda.create('sendEmail', { from: 'some guy' }).schedule('1 minute').save(),
+				globalAgenda.create('some job').schedule('30 seconds').save()
+			]);
+		});
+
+		it('disables all jobs', async () => {
+			const ct = await globalAgenda.disable({});
+
+			expect(ct).to.equal(3);
+			const disabledJobs = await globalAgenda.jobs({});
+
+			expect(disabledJobs).to.have.length(3);
+			disabledJobs.map(x => expect(x.attrs.disabled).to.equal(true));
+		});
+
+		it('disables jobs when queried by name', async () => {
+			const ct = await globalAgenda.disable({ name: 'sendEmail' });
+
+			expect(ct).to.equal(2);
+			const disabledJobs = await globalAgenda.jobs({ name: 'sendEmail' });
+
+			expect(disabledJobs).to.have.length(2);
+			disabledJobs.map(x => expect(x.attrs.disabled).to.equal(true));
+		});
+
+		it('disables jobs when queried by data', async () => {
+			const ct = await globalAgenda.disable({ 'data.from': 'some guy' });
+
+			expect(ct).to.equal(1);
+			const disabledJobs = await globalAgenda.jobs({ 'data.from': 'some guy', disabled: true });
+
+			expect(disabledJobs).to.have.length(1);
+		});
+
+		it('does not modify `nextRunAt`', async () => {
+			const js = await globalAgenda.jobs({ name: 'some job' });
+			const ct = await globalAgenda.disable({ name: 'some job' });
+
+			expect(ct).to.equal(1);
+			const disabledJobs = await globalAgenda.jobs({ name: 'some job', disabled: true });
+
+			expect(disabledJobs[0].attrs.nextRunAt?.toString()).to.equal(
+				js[0].attrs.nextRunAt!.toString()
+			);
+		});
+	});
+
+	describe('enable', () => {
+		beforeEach(async () => {
+			await Promise.all([
+				globalAgenda.create('sendEmail', { to: 'some guy' }).schedule('1 minute').save(),
+				globalAgenda.create('sendEmail', { from: 'some guy' }).schedule('1 minute').save(),
+				globalAgenda.create('some job').schedule('30 seconds').save()
+			]);
+		});
+
+		it('enables all jobs', async () => {
+			const ct = await globalAgenda.enable({});
+
+			expect(ct).to.equal(3);
+			const enabledJobs = await globalAgenda.jobs({});
+
+			expect(enabledJobs).to.have.length(3);
+			enabledJobs.map(x => expect(x.attrs.disabled).to.equal(false));
+		});
+
+		it('enables jobs when queried by name', async () => {
+			const ct = await globalAgenda.enable({ name: 'sendEmail' });
+
+			expect(ct).to.equal(2);
+			const enabledJobs = await globalAgenda.jobs({ name: 'sendEmail' });
+
+			expect(enabledJobs).to.have.length(2);
+			enabledJobs.map(x => expect(x.attrs.disabled).to.equal(false));
+		});
+
+		it('enables jobs when queried by data', async () => {
+			const ct = await globalAgenda.enable({ 'data.from': 'some guy' });
+
+			expect(ct).to.equal(1);
+			const enabledJobs = await globalAgenda.jobs({ 'data.from': 'some guy', disabled: false });
+
+			expect(enabledJobs).to.have.length(1);
+		});
+
+		it('does not modify `nextRunAt`', async () => {
+			const js = await globalAgenda.jobs({ name: 'some job' });
+			const ct = await globalAgenda.enable({ name: 'some job' });
+
+			expect(ct).to.equal(1);
+			const enabledJobs = await globalAgenda.jobs({ name: 'some job', disabled: false });
+
+			expect(enabledJobs[0].attrs.nextRunAt?.toString()).to.equal(
+				js[0].attrs.nextRunAt!.toString()
+			);
 		});
 	});
 

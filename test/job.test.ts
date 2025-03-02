@@ -6,7 +6,7 @@ import * as assert from 'node:assert';
 import { DateTime } from 'luxon';
 import { Db } from 'mongodb';
 
-import * as delay from 'delay';
+import { delay } from '../src/utils/delay';
 import * as sinon from 'sinon';
 import { fail } from 'assert';
 import { Job } from '../src/Job';
