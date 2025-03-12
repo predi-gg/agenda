@@ -542,7 +542,7 @@ export class Agenda extends EventEmitter {
 		log('Agenda.now(%s, [Object])', name);
 		try {
 			let job = await this.jobs({ name })[0];
-			if (!job) job = await this.create(name, data);
+			if (!job) job = this.create(name, data);
 
 			job.schedule(new Date());
 			await job.save();
