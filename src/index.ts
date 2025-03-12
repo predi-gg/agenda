@@ -541,7 +541,7 @@ export class Agenda extends EventEmitter {
 	async now<DATA>(name: string, data?: DATA): Promise<Job<DATA | void>> {
 		log('Agenda.now(%s, [Object])', name);
 		try {
-			let job = await this.jobs({ name })[0];
+			let job = (await this.jobs({ name }))[0];
 			if (!job) job = this.create(name, data);
 
 			job.schedule(new Date());
