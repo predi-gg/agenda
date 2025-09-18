@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [6.1.6](https://github.com/Lol-prono/agenda/compare/v6.1.5...v6.1.6) (2025-09-18)
+
+
+### Bug Fixes
+
+* update mongodb dependency to version 6.18.0 ([3510b30](https://github.com/Lol-prono/agenda/commit/3510b30fc9a50ed29ea2ebc1678844ec6fead266))
+
 ### [6.1.5](https://github.com/Lol-prono/agenda/compare/v6.1.4...v6.1.5) (2025-09-18)
 
 
